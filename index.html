@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tienda 24 Horas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- ...existing code... -->
+</head>
+<body>
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+        header {
+            background: linear-gradient(rgba(34,34,34,0.85), rgba(34,34,34,0.85)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80') center center/cover no-repeat;
+            color: #fff;
+            padding: 2.5rem 1rem 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 12px #0004;
+        }
+        .container { max-width: 900px; margin: 2rem auto; background: transparent; padding: 2rem; border-radius: 8px; box-shadow: none; }
+        h2.section-titulo {
+            color: #1565c0;
+            background: linear-gradient(135deg, #e3f0ff 60%, #b3e5fc 100%);
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #2196f355;
+            font-size: 1.25rem;
+            font-weight: bold;
+            width: 200px;
+            margin: 2.5rem 0 1rem 0;
+            padding: 0.7rem 0.5rem 0.7rem 0.5rem;
+            text-align: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .section-titulo .arrow {
+            font-size: 2rem;
+            color: #2196f3;
+            margin: 0 0.3rem;
+            user-select: none;
+        }
+        .productos {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2rem;
+            justify-content: start;
+        }
+        .recompensas {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2rem;
+        }
+        .producto, .recompensa {
+            background: linear-gradient(135deg, #e3f0ff 60%, #b3e5fc 100%);
+            border: 2px solid #2196f3;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 12px #2196f355;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .producto:hover, .recompensa:hover {
+            transform: scale(1.04);
+            box-shadow: 0 6px 24px #2196f399;
+            z-index: 2;
+        }
+        .oferta { background: #ffe066; color: #b8860b; padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem; font-weight: bold; }
+        button { background: #28a745; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 0.5rem; }
+        button:disabled { background: #aaa; }
+        .recompensas-info {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            background: #e3f0ff;
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 1.1rem 2.2rem 1.1rem 1.5rem;
+            color: #0d47a1;
+            min-width: 260px;
+            max-width: 340px;
+            box-shadow: 0 2px 12px #0003;
+            z-index: 20;
+            text-align: right;
+            font-size: 1.08rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Tienda 24 Horas</h1>
+        <p>¡Abierto siempre para ti!</p>
+        <div style="margin:1.2rem 0 0 2.5rem;max-width:700px;padding:1rem 2rem;background:#ffeb3b;color:#b71c1c;font-size:1.3rem;font-weight:bold;border:3px solid #f44336;border-radius:10px;box-shadow:0 2px 8px #0002;text-align:left;">
+            ¡Si la compra es superior a 10 euros recibirás <span style='color:#2196f3;'>5 puntos extra</span> además del <span style='color:#388e3c;'>envío a su domicilio en menos de 24 horas</span>!
+        </div>
+    </header>
+    <div class="recompensas-info">
+        <h3 style="margin:0 0 0.5rem 0;">Recompensas acumuladas: <span id="puntos"></span> puntos</h3>
+        <h3 style="margin:0;">Saldo tarjeta FlashShop: <span id="saldo-tarjeta"></span> €</h3>
+        <div style="margin-top:0.5rem;">
+            <input id="input-saldo" type="number" min="1" max="500" step="1" placeholder="Cantidad (€)" style="width:90px;padding:0.3em 0.5em;border-radius:6px;border:1.5px solid #2196f3;font-size:1rem;">
+            <button onclick="anadirSaldo()" style="background:#2196f3;color:#fff;border:none;padding:0.3em 1em;border-radius:6px;font-size:1rem;cursor:pointer;margin-left:0.5em;">Añadir saldo</button>
+        </div>
+        <div style="margin-top:0.7rem;display:flex;align-items:center;gap:0.7em;">
+            <span style="font-size:1.05rem;">¿Cuánto dinero quieres añadir desde tu tarjeta?</span>
+            <span style="font-size:1.3rem;letter-spacing:0.2em;color:#888;user-select:none;">**** **** **** 1234</span>
+        </div>
+    </div>
+    <div class="container">
+        <div class="oferta" style="margin-bottom:1.2rem;max-width:340px;padding:1.1rem 1.5rem 1.1rem 2.2rem;font-size:1.08rem;box-shadow:0 2px 12px #0003;">Oferta especial: ¡2x1 en Snacks hasta medianoche!</div>
+        <h2 class="section-titulo"><span class="arrow">➤</span>Productos a la venta<span class="arrow">➤</span></h2>
+        <div class="productos" id="productos"></div>
+        <h2 class="section-titulo" style="margin-top:3rem;"><span class="arrow">➤</span>Coleccionismo<span class="arrow">➤</span></h2>
+        <div class="recompensas" id="coleccionismo"></div>
+        <h2 class="section-titulo"> <span class="arrow">➤</span>Productos exclusivos por recompensas<span class="arrow">➤</span></h2>
+        <div class="recompensas" id="recompensas"></div>
+
+        <div style="margin:3rem 0 2rem 0;display:flex;flex-direction:column;align-items:center;">
+            <h2 class="section-titulo" style="margin-bottom:1.5rem;"><span class="arrow">➤</span>Prueba tu suerte<span class="arrow">➤</span></h2>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2rem;width:100%;max-width:900px;">
+                <div class="producto" style="min-width:180px;">
+                    <h4>Ruleta FlashShop</h4>
+                    <p>Gira la ruleta y gana puntos, saldo o premios sorpresa.</p>
+                    <button onclick="jugarRuleta()">Jugar</button>
+                    <ul style="margin:1rem 0 0 0;padding:0 0 0 1.1em;text-align:left;font-size:0.98rem;">
+                        <li>10 puntos: <b>8%</b></li>
+                        <li>5€ en tarjeta: <b>4%</b></li>
+                        <li>Nada: <b>75%</b></li>
+                        <li>25 puntos: <b>5%</b></li>
+                        <li>Premio sorpresa: <b>8%</b></li>
+                    </ul>
+                </div>
+                <div class="producto" style="min-width:180px;">
+                    <h4>Rasca y Gana</h4>
+                    <p>Rasca la tarjeta virtual y descubre si eres ganador.</p>
+                    <button onclick="jugarRasca()">Jugar</button>
+                    <ul style="margin:1rem 0 0 0;padding:0 0 0 1.1em;text-align:left;font-size:0.98rem;">
+                        <li>Recompensa especial: <b>4%</b></li>
+                        <li>Nada: <b>70%</b></li>
+                        <li>15 puntos: <b>15%</b></li>
+                        <li>2€ en tarjeta: <b>11%</b></li>
+                    </ul>
+                </div>
+                <div class="producto" style="min-width:180px;">
+                    <h4>Caja Misteriosa</h4>
+                    <p>Abre una caja misteriosa y recibe una sorpresa aleatoria.</p>
+                    <button onclick="jugarCaja()">Jugar</button>
+                    <ul style="margin:1rem 0 0 0;padding:0 0 0 1.1em;text-align:left;font-size:0.98rem;">
+                        <li>Caja vacía: <b>70%</b></li>
+                        <li>20 puntos: <b>10%</b></li>
+                        <li>10€ en tarjeta: <b>7%</b></li>
+                        <li>Premio doble: <b>13%</b></li>
+                    </ul>
+                </div>
+            </div>
+            <div id="resultado-juego" style="margin-top:2rem;font-size:1.2rem;font-weight:bold;color:#e65100;"></div>
+        </div>
+    </div>
+    <script>
+        // Productos de coleccionismo
+        const coleccionismo = [
+            { nombre: 'Camiseta de Fútbol Edición Limitada', precio: 25.00 },
+            { nombre: 'Taza FlashShop', precio: 8.00 },
+            { nombre: 'Balón Firmado', precio: 40.00 },
+            { nombre: 'Gorra Retro', precio: 12.00 },
+            { nombre: 'Llavero Exclusivo', precio: 4.50 }
+        ];
+
+        function renderColeccionismo() {
+            const cont = document.getElementById('coleccionismo');
+            cont.innerHTML = '';
+            coleccionismo.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'recompensa';
+                div.innerHTML = `
+                    <h4>${item.nombre}</h4>
+                    <p>Precio: €${item.precio.toFixed(2)}</p>
+                    <button disabled style="background:#aaa;">Solo en tienda física</button>`;
+                cont.appendChild(div);
+            });
+        }
+        const productos = [
+            { id: 1, nombre: 'Agua Mineral', precio: 1.00, puntos: 2 },
+            { id: 2, nombre: 'Snack 2x1', precio: 1.50, oferta: true, puntos: 3 },
+            { id: 3, nombre: 'Bebida Energética', precio: 2.00, puntos: 4 },
+            { id: 4, nombre: 'Sándwich', precio: 2.50, puntos: 5 },
+            { id: 5, nombre: 'Café', precio: 1.20, puntos: 2 },
+            { id: 6, nombre: 'Galletas', precio: 1.30, puntos: 2 },
+            { id: 7, nombre: 'Zumo de Naranja', precio: 1.80, puntos: 3 },
+            { id: 8, nombre: 'Ensalada Fresca', precio: 3.00, puntos: 6 },
+            { id: 9, nombre: 'Fruta Variada', precio: 2.20, puntos: 4 },
+            { id: 10, nombre: 'Chocolate', precio: 1.50, puntos: 3 },
+            { id: 11, nombre: 'Jamón Ibérico', precio: 12.00, puntos: 15 },
+            { id: 12, nombre: 'Queso Curado', precio: 8.50, puntos: 10 },
+            { id: 13, nombre: 'Botella de Vino', precio: 11.00, puntos: 13 },
+            { id: 14, nombre: 'Caja de Bombones', precio: 6.50, puntos: 8 },
+            { id: 15, nombre: 'Pack Familiar de Refrescos', precio: 7.20, puntos: 9 }
+        ];
+        const recompensas = [
+            { id: 101, nombre: 'Chicle', puntos: 5 },
+            { id: 102, nombre: 'Barra de Cereal', puntos: 10 },
+            { id: 103, nombre: 'Descuento 1€', puntos: 15 },
+            { id: 200, nombre: 'Auriculares Bluetooth Premium', puntos: 50, especial: true },
+            { id: 300, nombre: 'Mega Pack FlashShop (1 unidad de cada producto)', puntos: 1000, especial: true }
+        ];
+        // Puntos aleatorios entre 10 y 40 para el cliente
+        let puntos = Math.floor(Math.random() * 31) + 10;
+        // Saldo de tarjeta FlashShop aleatorio entre 5€ y 50€
+        let saldoTarjeta = (Math.random() * 45 + 5).toFixed(2);
+
+        // Inicializar compras por producto (id) con valores aleatorios entre 0 y 20
+        if (!window.comprasPorProducto) {
+            window.comprasPorProducto = {};
+            productos.forEach(p => {
+                window.comprasPorProducto[p.id] = Math.floor(Math.random() * 21);
+            });
+        }
+
+        function renderProductos() {
+            const cont = document.getElementById('productos');
+            cont.innerHTML = '';
+            let puedeComprar = false;
+                // Control de tiros semanales y gasto en los últimos 30 días
+            // IDs de productos a marcar como canjeados recientemente
+            const idsCanjeados = [2, 5, 11, 14];
+            productos.forEach(prod => {
+                const div = document.createElement('div');
+                div.className = 'producto';
+                const puedePagar = parseFloat(saldoTarjeta) >= prod.precio;
+                if (puedePagar) puedeComprar = true;
+                div.innerHTML = `
+                    <h4 style="display:flex;align-items:center;justify-content:center;gap:0.5em;">
+                        ${prod.nombre}
+                        ${idsCanjeados.includes(prod.id) ? '<span style=\"background:#ff9800;color:#fff;font-size:0.85rem;padding:0.2em 0.7em;border-radius:8px;margin-left:0.3em;box-shadow:0 1px 4px #ff980055;\">canjeado recientemente</span>' : ''}
+                    </h4>
+                    <p>Precio: €${prod.precio.toFixed(2)}</p>
+                    <p><span style='color:#28a745;'>Ganas ${prod.puntos} puntos</span></p>
+                    <div style="margin:0.5rem 0 0.2rem 0;font-weight:bold;color:#1565c0;">Comprados: <span id="comprados-${prod.id}">${window.comprasPorProducto[prod.id]}</span></div>
+                    ${prod.oferta ? '<div class=\"oferta\">2x1</div>' : ''}
+                    <button onclick=\"comprarProducto(${prod.id})\" ${puedePagar ? '' : 'disabled'}>Comprar</button>`;
+                cont.appendChild(div);
+            });
+            // Mensaje si no se puede comprar nada
+            let aviso = document.getElementById('aviso-recarga');
+            if (!puedeComprar) {
+                if (!aviso) {
+                    aviso = document.createElement('div');
+                    aviso.id = 'aviso-recarga';
+                    aviso.style = 'color:#fff;background:#e53935;padding:2rem 1rem;font-size:2rem;text-align:center;margin:2rem 0;border-radius:10px;box-shadow:0 2px 8px #0004;';
+                    aviso.textContent = 'Recarga la tarjeta FlashShop para seguir comprando';
+                    cont.parentNode.insertBefore(aviso, cont.nextSibling);
+                }
+            } else if (aviso) {
+                aviso.remove();
+            }
+        }
+
+        function renderRecompensas() {
+            const cont = document.getElementById('recompensas');
+            cont.innerHTML = '';
+            recompensas.forEach(rec => {
+                const div = document.createElement('div');
+                div.className = 'recompensa';
+                div.innerHTML = `
+                    <h4>${rec.nombre}${rec.especial ? ' ⭐' : ''}</h4>
+                    <p>Por ${rec.puntos} puntos</p>
+                    ${rec.especial ? '<div style="color:#d35400;font-weight:bold;">¡Recompensa especial!</div>' : ''}
+                    <button onclick="canjearRecompensa(${rec.id})" ${puntos < rec.puntos ? 'disabled' : ''}>Canjear</button>`;
+                cont.appendChild(div);
+            });
+        }
+
+        window.comprarProducto = function(id) {
+            const prod = productos.find(p => p.id === id);
+            if (prod) {
+                if (parseFloat(saldoTarjeta) < prod.precio) {
+                    alert('Saldo insuficiente en tu tarjeta FlashShop.');
+                    return;
+                }
+                saldoTarjeta = (parseFloat(saldoTarjeta) - prod.precio).toFixed(2);
+                document.getElementById('saldo-tarjeta').textContent = saldoTarjeta;
+                alert(`¡Gracias por comprar ${prod.nombre}! Has ganado ${prod.puntos} puntos de recompensa.`);
+                puntos += prod.puntos;
+                document.getElementById('puntos').textContent = puntos;
+                // Sumar uno al contador de compras de ese producto
+                window.comprasPorProducto[id] = (window.comprasPorProducto[id] || 0) + 1;
+                // Actualizar solo el contador visual de ese producto
+                const span = document.getElementById('comprados-' + id);
+                if (span) span.textContent = window.comprasPorProducto[id];
+                renderProductos();
+                renderRecompensas();
+            }
+        }
+
+        window.canjearRecompensa = function(id) {
+            const rec = recompensas.find(r => r.id === id);
+            if (rec && puntos >= rec.puntos) {
+                puntos -= rec.puntos;
+                document.getElementById('puntos').textContent = puntos;
+                alert(`¡Has canjeado ${rec.nombre}!`);
+                renderRecompensas();
+            }
+        }
+
+        // Mostrar puntos y saldo iniciales
+        document.getElementById('puntos').textContent = puntos;
+        document.getElementById('saldo-tarjeta').textContent = saldoTarjeta;
+        renderProductos();
+        renderColeccionismo();
+        renderRecompensas();
+
+        // Función para añadir saldo
+        window.anadirSaldo = function() {
+            const input = document.getElementById('input-saldo');
+            let cantidad = parseFloat(input.value);
+            if (isNaN(cantidad) || cantidad <= 0) {
+                input.value = '';
+                input.placeholder = 'Introduce una cantidad válida';
+                input.style.borderColor = '#e53935';
+                return;
+            }
+            saldoTarjeta = (parseFloat(saldoTarjeta) + cantidad).toFixed(2);
+            document.getElementById('saldo-tarjeta').textContent = saldoTarjeta;
+            input.value = '';
+            input.placeholder = 'Cantidad (€)';
+            input.style.borderColor = '#2196f3';
+        }
+        // Juegos de suerte
+        function jugarRuleta() {
+            const btn = document.querySelector('button[onclick="jugarRuleta()"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.style.background = '#aaa';
+                btn.style.cursor = 'not-allowed';
+            }
+            const premios = [
+                '¡Ganaste 10 puntos!',
+                '¡Ganaste 5€ en tu tarjeta!',
+                '¡Nada por esta vez!',
+                '¡Ganaste 25 puntos!',
+                '¡Premio sorpresa!'
+            ];
+            const premio = premios[Math.floor(Math.random() * premios.length)];
+            mostrarResultadoJuego(premio);
+            if (premio.includes('puntos')) {
+                const puntosGanados = parseInt(premio.match(/\d+/)[0]);
+                puntos += puntosGanados;
+                document.getElementById('puntos').textContent = puntos;
+            } else if (premio.includes('€')) {
+                const saldoGanado = parseInt(premio.match(/\d+/)[0]);
+                saldoTarjeta = (parseFloat(saldoTarjeta) + saldoGanado).toFixed(2);
+                document.getElementById('saldo-tarjeta').textContent = saldoTarjeta;
+            }
+        }
+        function jugarRasca() {
+            const btn = document.querySelector('button[onclick="jugarRasca()"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.style.background = '#aaa';
+                btn.style.cursor = 'not-allowed';
+            }
+            const premios = [
+                '¡Has ganado una recompensa especial!',
+                '¡Nada, sigue intentando!',
+                '¡Ganaste 15 puntos!',
+                '¡Ganaste 2€ en tu tarjeta!'
+            ];
+            const premio = premios[Math.floor(Math.random() * premios.length)];
+            mostrarResultadoJuego(premio);
+            if (premio.includes('puntos')) {
+                const puntosGanados = parseInt(premio.match(/\d+/)[0]);
+                puntos += puntosGanados;
+                document.getElementById('puntos').textContent = puntos;
+            } else if (premio.includes('€')) {
+                const saldoGanado = parseInt(premio.match(/\d+/)[0]);
+                saldoTarjeta = (parseFloat(saldoTarjeta) + saldoGanado).toFixed(2);
+                document.getElementById('saldo-tarjeta').textContent = saldoTarjeta;
+            }
+        }
+        function jugarCaja() {
+            const btn = document.querySelector('button[onclick="jugarCaja()"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.style.background = '#aaa';
+                btn.style.cursor = 'not-allowed';
+            }
+            const premios = [
+                '¡Caja vacía! Intenta de nuevo.',
+                '¡Ganaste 20 puntos!',
+                '¡Ganaste 10€ en tu tarjeta!',
+                '¡Premio doble: 30 puntos y 5€!'
+            ];
+            const premio = premios[Math.floor(Math.random() * premios.length)];
+            mostrarResultadoJuego(premio);
+            if (premio.includes('puntos')) {
+                const puntosGanados = premio.includes('doble') ? 30 : (parseInt(premio.match(/\d+/)[0]) || 0);
+                puntos += puntosGanados;
+                document.getElementById('puntos').textContent = puntos;
+            }
+            if (premio.includes('€')) {
+                const saldoGanado = premio.includes('doble') ? 5 : (parseInt(premio.match(/\d+/)[0]) || 0);
+                saldoTarjeta = (parseFloat(saldoTarjeta) + saldoGanado).toFixed(2);
+                document.getElementById('saldo-tarjeta').textContent = saldoTarjeta;
+            }
+        }
+        function mostrarResultadoJuego(texto) {
+            document.getElementById('resultado-juego').innerHTML = texto +
+                '<div style="margin-top:1.2rem;font-size:1.1rem;color:#2196f3;font-weight:bold;">Enhorabuena, vuelve la semana que viene</div>';
+        }
+    </script>
+</body>
+</html>
+<div id="canjeo-codigo" style="max-width:500px;margin:3rem auto 2rem auto;padding:2rem 1rem;background:#fff3e0;border:2px solid #ff9800;border-radius:12px;box-shadow:0 2px 8px #0002;text-align:center;">
+    <h2 style="color:#e65100;">Canjear código</h2>
+    <input id="input-codigo" maxlength="4" style="font-size:1.2rem;padding:0.5rem 1rem;border:1.5px solid #ff9800;border-radius:6px;width:120px;text-align:center;letter-spacing:0.3em;" placeholder="----">
+    <button id="btn-canjear" style="font-size:1.1rem;padding:0.5rem 1.5rem;margin-left:1rem;background:#ff9800;color:#fff;border:none;border-radius:6px;cursor:pointer;">Canjear</button>
+    <div id="ruleta-container" style="margin-top:2rem;"></div>
+</div>
+
+<div style="max-width:700px;margin:3rem auto 2rem auto;padding:1.5rem 1rem;background:linear-gradient(90deg,#2196f3 60%,#ff9800 100%);color:#fff;font-size:1.4rem;font-weight:bold;border-radius:16px;box-shadow:0 4px 24px #0005;text-align:center;letter-spacing:0.02em;">
+    ¡También puedes encontrar tiendas FlashShop en ciudades como <span style="color:#ffe082;text-shadow:0 1px 4px #000;">Málaga</span>, <span style="color:#ffe082;text-shadow:0 1px 4px #000;">Sevilla</span>, <span style="color:#ffe082;text-shadow:0 1px 4px #000;">Madrid</span>, <span style="color:#ffe082;text-shadow:0 1px 4px #000;">Barcelona</span>, <span style="color:#ffe082;text-shadow:0 1px 4px #000;">Valencia</span> y <span style="color:#ffe082;text-shadow:0 1px 4px #000;">Guadalajara</span>!
+</div>
+
+<script>
+    // Ruleta de premios
+    const premiosRuleta = [
+        { tipo: 'puntos', valor: 10, texto: '¡Ganaste 10 puntos!' },
+        { tipo: 'puntos', valor: 25, texto: '¡Ganaste 25 puntos!' },
+        { tipo: 'saldo', valor: 5, texto: '¡Ganaste 5€ en tu tarjeta!' },
+        { tipo: 'nada', valor: 0, texto: '¡Oh! No ganaste nada esta vez.' },
+        { tipo: 'puntos', valor: 50, texto: '¡Increíble! 50 puntos extra!' },
+        { tipo: 'saldo', valor: 10, texto: '¡Ganaste 10€ en tu tarjeta!' },
+        { tipo: 'nada', valor: 0, texto: '¡Sigue intentando, suerte la próxima!' }
+    ];
+
+    document.getElementById('btn-canjear').onclick = function() {
+        const codigo = document.getElementById('input-codigo').value.trim();
+        const ruletaDiv = document.getElementById('ruleta-container');
+        ruletaDiv.innerHTML = '';
+        if (/^[A-Za-z]{4}$/.test(codigo)) {
+            // Mostrar ruleta animada
+            let ruletaAnim = document.createElement('div');
+            ruletaAnim.style = 'margin:1.5rem auto;font-size:2rem;font-weight:bold;color:#ff9800;';
+            ruletaAnim.textContent = 'Girando la ruleta...';
+            ruletaDiv.appendChild(ruletaAnim);
+            setTimeout(() => {
+                const premio = premiosRuleta[Math.floor(Math.random() * premiosRuleta.length)];
+                ruletaAnim.textContent = premio.texto;
+                if (premio.tipo === 'puntos') {
+                    puntos += premio.valor;
+                    document.getElementById('puntos').textContent = puntos;
+                } else if (premio.tipo === 'saldo') {
+                    saldoTarjeta = (parseFloat(saldoTarjeta) + premio.valor).toFixed(2);
+                    document.getElementById('saldo-tarjeta').textContent = saldoTarjeta;
+                }
+            }, 1800);
+        } else {
+            ruletaDiv.innerHTML = '<span style="color:#e53935;font-weight:bold;">Introduce un código válido de 4 letras</span>';
+        }
+    };
+</script>
